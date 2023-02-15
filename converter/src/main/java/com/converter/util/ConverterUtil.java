@@ -1,10 +1,14 @@
 package com.converter.util;
 
 import static com.converter.util.constant.ConverterConstant.ASSUMED_MAX_NUMBER_LENGTH;
+import static com.converter.util.constant.ConverterConstant.FLOATING_POINT_SCALE;
+import static com.converter.util.constant.ConverterConstant.ZERO_INDEX;
 import static com.converter.util.constant.ConverterConstant.PriceChoice.OTHER;
 import static com.converter.util.constant.ConverterConstant.PriceChoice.PLN;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -44,9 +48,9 @@ public class ConverterUtil {
 		return priceToConvert;
 	}
 	
-	public static ConverterConstant.PriceChoice validateForCurrencyType(String priceOther, String pricePln){
+	public static ConverterConstant.PriceChoice checkForCurrencyType(String priceOther, String pricePln){
 		
-		if (priceOther!=null && !priceOther.isBlank())
+		if (priceOther !=null && !priceOther.isBlank())
 			return OTHER;
 		else if (pricePln != null && !pricePln.isBlank())
 			return PLN;
@@ -74,5 +78,26 @@ public class ConverterUtil {
 		return jsonMapper.readValue(new URL("http://api.nbp.pl/api/exchangerates/rates/a/" +
 					currencyType.toLowerCase() + "/"),
 						Table.class);
+	}
+	
+	public static BigDecimal convertStringToDecimalAndScale(String priceToConvert) {
+		return new BigDecimal(priceToConvert).setScale(FLOATING_POINT_SCALE, RoundingMode.HALF_UP);
+	}
+	
+	public static BigDecimal getConversionResult(Table singleRate, 
+												 ConverterConstant.PriceChoice currencyType,
+												 BigDecimal priceToConvertScaled) {
+		BigDecimal valueToCalculate = null;
+		BigDecimal currencyRatio =
+				new BigDecimal(singleRate.getRates().get(ZERO_INDEX).getMid());
+		
+		if (currencyType.equals(PLN)) 
+			valueToCalculate = (priceToConvertScaled 
+					.divide(currencyRatio,FLOATING_POINT_SCALE, RoundingMode.HALF_UP));	
+		else
+			valueToCalculate = priceToConvertScaled
+			.multiply(currencyRatio).setScale(FLOATING_POINT_SCALE, RoundingMode.HALF_UP);
+		
+		return valueToCalculate;
 	}
 }

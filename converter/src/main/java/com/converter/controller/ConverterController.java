@@ -1,17 +1,17 @@
 package com.converter.controller;
 
-import static com.converter.util.constant.ConverterConstant.FLOATING_POINT_SCALE;
 import static com.converter.util.constant.ConverterConstant.STARTING_INDEX_TABLE_A;
 import static com.converter.util.constant.ConverterConstant.ZERO_INDEX;
 import static com.converter.util.constant.ConverterConstant.PriceChoice.PLN;
+import static com.converter.util.ConverterUtil.convertStringToDecimalAndScale;
+import static com.converter.util.ConverterUtil.getConversionResult;
 import static com.converter.util.ConverterUtil.prepareAndGetPrice;
 import static com.converter.util.ConverterUtil.validateConvertedPrice;
-import static com.converter.util.ConverterUtil.validateForCurrencyType;
+import static com.converter.util.ConverterUtil.checkForCurrencyType;
 import static com.converter.util.ConverterUtil.validatePricesForNull;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -62,6 +62,10 @@ public class ConverterController {
 			ioException.printStackTrace();
 		}
 		
+		if(tableOfRates == null) {
+			model.addAttribute("message", "Error has occured while loading currencies");
+		}
+		
 		List<String> availableCurrencyCodes =
 				tableOfRates[STARTING_INDEX_TABLE_A].getRates()
 				.stream()
@@ -87,16 +91,16 @@ public class ConverterController {
 		
 		try {
 			
-			if((infoMessage = validatePricesForNull(priceOther, pricePln))!=null) {
+			if ((infoMessage = validatePricesForNull(priceOther, pricePln))!=null) {
 				redirectAttr.addFlashAttribute("message", infoMessage);
 				return "redirect:/calculator";
 			}
 			
 			priceToConvert = prepareAndGetPrice(priceOther, pricePln);
 			
-			currencyType = validateForCurrencyType(priceOther, pricePln);
+			currencyType = checkForCurrencyType(priceOther, pricePln);
 			
-			if((infoMessage = validateConvertedPrice(priceToConvert))!=null) {
+			if ((infoMessage = validateConvertedPrice(priceToConvert))!=null) {
 				redirectAttr.addFlashAttribute("message", infoMessage);
 				return "redirect:/calculator";
 			}
@@ -113,25 +117,19 @@ public class ConverterController {
 				return "redirect:/calculator";
 			}
 			
-			BigDecimal currencyRatio = new BigDecimal(rate.getRates().get(ZERO_INDEX).getMid());
+			BigDecimal priceToConvertScaled = convertStringToDecimalAndScale(priceToConvert);
+			BigDecimal convertionResult = getConversionResult(rate, currencyType, 
+					priceToConvertScaled);
+			
+			if (currencyType.equals(PLN))
+				convertionResultMessage  += (convertionResult +
+						" " + currency + " = " + priceToConvertScaled + " PLN");
+			else 
+				convertionResultMessage  += (priceToConvertScaled  + " " + currency +
+						" = " + convertionResult + " PLN");
+			
 			infoMessage = "1 " + currency + " = " + 
 					rate.getRates().get(ZERO_INDEX).getMid() + " PLN";
-			
-			BigDecimal valueToCalculate = null;
-			BigDecimal priceToConvertScaled = new BigDecimal(priceToConvert).setScale(FLOATING_POINT_SCALE, RoundingMode.HALF_UP);
-			if (currencyType.equals(PLN)) {
-				valueToCalculate = (priceToConvertScaled 
-						.divide(currencyRatio,FLOATING_POINT_SCALE, RoundingMode.HALF_UP));
-				
-				convertionResultMessage  += (valueToCalculate.setScale(FLOATING_POINT_SCALE, RoundingMode.HALF_UP) +
-						" " + currency + " = " + priceToConvertScaled + " PLN");
-			}
-			else {
-				valueToCalculate = priceToConvertScaled
-						.multiply(currencyRatio);
-				convertionResultMessage  += (priceToConvertScaled  + " " + currency +
-						" = " + valueToCalculate.setScale(FLOATING_POINT_SCALE, RoundingMode.HALF_UP) + " PLN");
-			}
 			
 		}
 		catch (Exception exception) {

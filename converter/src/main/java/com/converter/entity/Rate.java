@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
+@Builder
 public class Rate {
 
 	@JsonAlias("effectiveDate")
