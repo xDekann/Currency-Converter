@@ -26,15 +26,34 @@ Download the whole project as a **.zip** file and extract it to any directory. A
 
 In Eclipse it can be imported via: *File->Import->Maven->Existing Maven Projects*
 
-After it is imported, simply launch the app by running **ConverterApplication.java** as a Java Application. Application as well as Tomcat server (http port 8080, make sure it is not occupied by any other service!!!) should be launched and the following text should appear in the console:
+After it is imported, simply launch the app by running **ConverterApplication.java** as a Java Application. Application as well as Tomcat server (http port 8080, make sure it is not occupied by any other service!!!) should be launched and the following text should appear in the console, without any errors:
 
 ![image](https://user-images.githubusercontent.com/106389146/219123680-f294942a-70d3-43b2-a258-6c93a97eb5a4.png)
 
 In order to use the application's functionalities, open your web browser and in the address bar type: **localhost:8080**.
 You should be redirected to **/calculator** path having the following interface:
-
-![image](https://user-images.githubusercontent.com/106389146/219124624-4b5d1b3b-77b9-42b1-91ac-37fe317595eb.png)
+<p align="center">
+ <img src="https://user-images.githubusercontent.com/106389146/219126796-c7f358da-c2cb-496c-909b-64f8b249ce2f.png" width="500">
+</p>
 
 ## Demonstration
+Example for PLN <-> GBP conversion:
+<br>
+<p align="center">
+ <img src="https://user-images.githubusercontent.com/106389146/219128117-deb6456c-eb54-4b44-9db7-0a2a20f2e4c3.png" width="500">
+</p>
+User is able to provide a value to only one field at a time, but he can choose any of them:
+<br>
+<br>
+<p align="center">
+ <img src="https://user-images.githubusercontent.com/106389146/219127698-7d769660-4421-4450-b34b-910792b02a7b.png" width="500">
+</p>
+If nothing has been filled, adequate message appears:
+<br>
+<br>
+<p align="center">
+ <img src="https://user-images.githubusercontent.com/106389146/219128431-d718d40f-5a51-47a8-bd20-5f91271dcd97.png" width="500">
+</p>
 
 ## Additional
+Unit and integration tests have been performed using Junit Jupiter and Mockito. Project has been initialized using <a href="https://start.spring.io/">Spring initializr</a>.
